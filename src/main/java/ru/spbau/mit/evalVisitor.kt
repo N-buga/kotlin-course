@@ -74,6 +74,9 @@ class EvalVisitor: LangParserBaseVisitor<Int>() {
                         val returnValue = funcCtx.bodyWithBraces().accept(this)
                         returnVal = null
                         stackScopes.remove(stackScopes.last())
+                        if (returnValue == null) {
+                            return 0
+                        }
                         return returnValue
                     }
                 } else {
@@ -90,7 +93,7 @@ class EvalVisitor: LangParserBaseVisitor<Int>() {
     override fun visitFunctionDeclaration(ctx: LangParser.FunctionDeclarationContext): Int? {
         val funcName = ctx.IDENTIFIER().text
         // check if exists in scope
-        if (stackScopes.any { scope -> scope.haveFunc(funcName) } || buildIn.keys.any{ key -> key == funcName})
+        if (stackScopes.last().haveFunc(funcName) || buildIn.keys.any{ key -> key == funcName})
             throw Exception(formatErrOut(
                     ctx.IDENTIFIER().symbol.line,
                     ctx.IDENTIFIER().symbol.charPositionInLine,
@@ -98,8 +101,7 @@ class EvalVisitor: LangParserBaseVisitor<Int>() {
             ))
 
         // add name and body to scope
-        val currentScope = stackScopes.last()
-        currentScope.addFunc(funcName, ctx)
+        stackScopes.last().addFunc(funcName, ctx)
 
         return 1
     }
@@ -107,7 +109,7 @@ class EvalVisitor: LangParserBaseVisitor<Int>() {
     override fun visitVariableDeclaration(ctx: VariableDeclarationContext): Int {
         val varName = ctx.IDENTIFIER().text
 
-        if (stackScopes.any { scope -> scope.haveVar(varName) })
+        if (stackScopes.last().haveVar(varName))
             throw Exception(formatErrOut(
                     ctx.IDENTIFIER().symbol.line,
                     ctx.IDENTIFIER().symbol.charPositionInLine,

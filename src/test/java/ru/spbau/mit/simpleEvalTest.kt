@@ -55,7 +55,8 @@ class LangSimpleEvalTest(private val code: String, private val answer: String) {
                     arrayOf("var x = 1 if (x == 1) {println(x + 1)} else {println(x + 2)}", "2\n"),
                     arrayOf("var x = 2 if (x == 1) {println(x + 1)} else {println(x + 2)}", "4\n"),
                     arrayOf("var x = 1 while (x < 3) {println(x) x = x + 1}", "1\n2\n"),
-                    arrayOf("fun pr() { println(1) } pr()", "1\n")
+                    arrayOf("fun pr() { println(1) } pr()", "1\n"),
+                    arrayOf("var x = 4 fun pr() { var x = 3 println(x) } pr() println(x)", "3\n4\n")
             )
         }
     }
